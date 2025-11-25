@@ -1,3 +1,5 @@
+//개발할 땐 재밌고 졸린 것도 참을만 한데 
+
 const jobTypeEl = document.getElementById('jobType');
 const startDateEl = document.getElementById('startDate');
 const endDateEl = document.getElementById('endDate');
@@ -166,15 +168,14 @@ function buildDaysTable() {
     tdHours.appendChild(hours);
     tr.appendChild(tdHours);
 
+    // 자동 계산 제거: 단순 상태만 변경
     chk.addEventListener('change', () => {
       hours.disabled = !chk.checked;
       if (!chk.checked) hours.value = '0';
-      recalc();
     });
 
-    hours.addEventListener('input', () => {
-      recalc();
-    });
+    // 여기서도 자동 계산 호출 없음
+    // hours.addEventListener('input', () => { ... });
 
     tbody.appendChild(tr);
   }
@@ -290,19 +291,10 @@ function buildMonthConfigTable() {
     const inpBonus = makeCell('month-bonusMonthly');
     const inpHoliday = makeCell('month-holidayBonus');
 
-    // 값 바뀌면 재계산
-    [
-      inpMonthlyPay,
-      inpDays,
-      inpBase,
-      inpDuty,
-      inpMeal,
-      inpLong,
-      inpBonus,
-      inpHoliday
-    ].forEach((el) => {
-      el.addEventListener('input', () => recalc());
-    });
+    // 여기서도 자동 계산 호출 제거 (사용자가 입력만 하고, 버튼으로 계산)
+    // [inpMonthlyPay, inpDays, inpBase, inpDuty, inpMeal, inpLong, inpBonus, inpHoliday].forEach((el) => {
+    //   el.addEventListener('input', () => recalc());
+    // });
 
     tbody.appendChild(tr);
   });
@@ -630,18 +622,29 @@ function recalc() {
 
 // ===== 이벤트 바인딩 =====
 
+// 방학 기간 변경 시: 테이블만 재생성 (계산은 버튼으로)
 [startDateEl, endDateEl].forEach((el) => {
   el.addEventListener('change', () => {
     buildDaysTable();
     buildMonthConfigTable();
-    recalc();
   });
 });
 
+// 직종/주휴일 수 변경 시: 역시 계산은 버튼으로
 [jobTypeEl, holidayDaysPerWeekEl].forEach((el) => {
-  el.addEventListener('change', () => recalc());
+  el.addEventListener('change', () => {
+    // 필요시 여기서 결과를 초기화해도 됨
+  });
 });
 
+// 계산하기 버튼 -> 실제 계산 실행
+const calcBtn = document.getElementById('calcBtn');
+if (calcBtn) {
+  calcBtn.addEventListener('click', () => {
+    recalc();
+  });
+}
+
+// 초기 테이블만 세팅
 buildDaysTable();
 buildMonthConfigTable();
-recalc();
